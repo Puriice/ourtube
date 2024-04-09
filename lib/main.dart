@@ -1,18 +1,38 @@
 import 'package:flutter/material.dart';
+import 'nav_bar.dart';
+import 'custom_nav_bar.dart'; // Import ContentContainer from separate file
 
 void main() {
   runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  const MainApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    const String appTitle = 'OurTube';
+    List<String> titles = [
+      '',
+      'All',
+      'Music',
+      'News',
+      'Live',
+      'Game',
+      'Cartoon'
+    ];
+    List<double> sizes = [40, 40, 80, 80, 80, 80, 80];
+
+    return MaterialApp(
+      title: appTitle,
       home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
+        backgroundColor: Colors.grey[400],
+        appBar: MyAppBar(
+          title: appTitle,
+        ),
+        body: ContentContainer(
+          titles: titles,
+          sizes: sizes,
         ),
       ),
     );

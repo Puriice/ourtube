@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
-class ContentContainer extends StatelessWidget {
+class SecondTopBar extends StatelessWidget {
   final List<String> titles;
   final List<double> sizes;
+  final Color color;
+  final dynamic bgColor;
 
-  const ContentContainer({
+  const SecondTopBar({
     Key? key,
     required this.titles,
     required this.sizes,
+    required this.color,
+    required this.bgColor,
   }) : super(key: key);
 
   @override
@@ -22,7 +26,7 @@ class ContentContainer extends StatelessWidget {
             height: 45,
             width: double.infinity,
             child: Container(
-              color: Colors.blueGrey[900],
+              color: bgColor,
               child: Padding(
                 padding: const EdgeInsets.all(6.0),
                 child: ListView.builder(
@@ -35,7 +39,7 @@ class ContentContainer extends StatelessWidget {
                         height: 35,
                         margin: const EdgeInsets.symmetric(horizontal: 5),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: color,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Center(
@@ -49,7 +53,7 @@ class ContentContainer extends StatelessWidget {
                       height: 35,
                       margin: const EdgeInsets.symmetric(horizontal: 5),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: color,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Center(

@@ -28,3 +28,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/video_picture_sample/one.jpeg
+    - assets/icon/logo_topbar.png

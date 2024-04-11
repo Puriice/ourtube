@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class VedioCard extends StatelessWidget {
+class VideoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(

@@ -14,46 +14,33 @@ class FirstTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
+    return SliverAppBar(
       backgroundColor: bgColor,
-      title: Column(
-        children: [
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.play_circle_fill_rounded),
-                color: color,
-                onPressed: () {},
-              ),
-              Text(
-                title,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.add_alert),
-                color: color,
-                tooltip: 'Notifications',
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.search),
-                color: color,
-                tooltip: 'Search',
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: const Icon(Icons.settings),
-                color: color,
-                onPressed: () {},
-              ),
-            ],
-          ),
-        ],
+      leadingWidth: 120.0,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 10.0),
+        child: Image.asset('assets/icon/logo_topbar.png'),
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.add_alert),
+          color: color,
+          tooltip: 'Notifications',
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.search),
+          color: color,
+          tooltip: 'Search',
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.settings),
+          color: color,
+          tooltip: 'Settings',
+          onPressed: () {},
+        ),
+      ],
     );
   }
 

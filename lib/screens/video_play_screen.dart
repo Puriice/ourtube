@@ -7,13 +7,13 @@ import '../sample_model/video.dart';
 class VideoPlayScreen extends StatefulWidget {
   final Video video;
 
-  VideoPlayScreen({Key? key, required this.video}) : super(key: key);
+  const VideoPlayScreen({Key? key, required this.video}) : super(key: key);
 
   @override
-  _VideoPlayScreenState createState() => _VideoPlayScreenState();
+  VideoPlayScreenState createState() => VideoPlayScreenState();
 }
 
-class _VideoPlayScreenState extends State<VideoPlayScreen> {
+class VideoPlayScreenState extends State<VideoPlayScreen> {
   late YoutubePlayerController _controller;
 
   @override
@@ -21,7 +21,7 @@ class _VideoPlayScreenState extends State<VideoPlayScreen> {
     super.initState();
     _controller = YoutubePlayerController(
       initialVideoId: widget.video.id,
-      flags: YoutubePlayerFlags(
+      flags: const YoutubePlayerFlags(
         autoPlay: true,
         mute: false,
       ),

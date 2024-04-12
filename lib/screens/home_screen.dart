@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+
+//components
 import '../top_bar.dart';
 import '../second_top_bar.dart';
 import '../nav_bar.dart';
 import '../components/card.dart';
+
+//page
+import 'video_play_screen.dart';
+
+// mock data import
+import 'package:wetube/sample_model/video.dart';
+import 'package:wetube/sample_model/user.dart';
 
 class MainHome extends StatefulWidget {
   final String appTitle;
@@ -14,7 +23,7 @@ class MainHome extends StatefulWidget {
 }
 
 class _MainHomeState extends State<MainHome> {
-  List<String> titles = ['', 'All', 'Music', 'News', 'Live', 'Gaming', 'Sport'];
+  List<String> titles = ['', 'All', 'Music', 'News', 'Animal', 'Gaming', 'Sport'];
   List<double> sizes = [40, 40, 80, 80, 80, 80, 80];
   Color textColor = Colors.white;
   var backgroundColor = Colors.blueGrey[900];
@@ -45,11 +54,22 @@ class _MainHomeState extends State<MainHome> {
               children: <Widget>[
                 Expanded(
                   child: ListView.builder(
-                    itemCount: 4,
+                    itemCount: sampleVideos.length,
                     itemBuilder: (context, index) {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 4.0),
-                        child: VideoCard(),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => VideoPlayScreen(
+                                        video: sampleVideos[index],
+                                      )),
+                            );
+                          },
+                          child: VideoCard(video: sampleVideos[index]),
+                        ),
                       );
                     },
                   ),

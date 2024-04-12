@@ -3,8 +3,16 @@ import 'package:flutter/material.dart';
 //page
 import 'screens/home_screen.dart';
 
+import 'package:provider/provider.dart';
+import 'providers/current_type_index_provider.dart'; 
+
 void main() {
-  runApp(const MainApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CurrentTypeIndexProvider(),
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {

@@ -33,7 +33,7 @@ final List<Video> sampleVideos = [
     title: 'Penguin chicks rescued by unlikely hero | Spy in the Snow - BBC',
     thumbnailUrl:
         'https://i.ytimg.com/vi/Z7PlUGbsXlQ/hqdefault.jpg?sqp=-oaymwEcCNACELwBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLB3BCT4s2LdalXLgfmyjWzPMStmgA',
-    type: 'News',
+    type: 'Animal',
     duration: '1:58',
     timestamp: DateTime(2018, 12, 26),
     viewCount: '28M',
@@ -46,7 +46,7 @@ final List<Video> sampleVideos = [
     title: '(여자)아이들((G)I-DLE) - 나는 아픈 건 딱 질색이니까(Fate) LIVE CLIP',
     thumbnailUrl:
         'https://i.ytimg.com/vi/ATK7gAaZTOM/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLBpcGINyJ4TX0JVbwg_JLpis-OqDg',
-    type: 'Animal',
+    type: 'Music',
     duration: '2:53',
     timestamp: DateTime(2024, 3, 13),
     viewCount: '27M',

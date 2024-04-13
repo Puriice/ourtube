@@ -8,7 +8,7 @@ class Video {
   final String type;
   final String duration;
   final DateTime timestamp;
-  final String viewCount;
+  final int viewCount;
   final String likes;
   final String dislikes;
 
@@ -36,7 +36,7 @@ final List<Video> sampleVideos = [
     type: 'Animal',
     duration: '1:58',
     timestamp: DateTime(2018, 12, 26),
-    viewCount: '28M',
+    viewCount: 28000000,
     likes: '631K',
     dislikes: '4',
   ),
@@ -49,7 +49,7 @@ final List<Video> sampleVideos = [
     type: 'Music',
     duration: '2:53',
     timestamp: DateTime(2024, 3, 13),
-    viewCount: '27M',
+    viewCount: 27000000,
     likes: '225K',
     dislikes: '8',
   ),
@@ -62,7 +62,7 @@ final List<Video> sampleVideos = [
     type: 'Animal',
     duration: '2:59',
     timestamp: DateTime(2022, 8, 24),
-    viewCount: '4.6M',
+    viewCount: 4600000,
     likes: '97k',
     dislikes: '4',
   ),
@@ -76,7 +76,7 @@ final List<Video> sampleVideos = [
     type: 'News',
     duration: '19:51',
     timestamp: DateTime(2024, 4, 12),
-    viewCount: '326k',
+    viewCount: 326000,
     likes: '4k',
     dislikes: '4',
   ),

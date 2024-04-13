@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:wetube/sample_model/video.dart';
 
-import 'package:wetube/components/time_pass_calculation.dart';
+//format
+import 'package:wetube/components/time_pass_calculation_format.dart';
+import 'package:wetube/components/number_format.dart';
 
 class VideoCard extends StatelessWidget {
   final Video video;
@@ -14,6 +16,9 @@ class VideoCard extends StatelessWidget {
     CalculateTimesPass calculator = CalculateTimesPass(video: video);
     String resultTimePassed = calculator.calculateTimePass();
 
+    FormatNumber viewFormat = FormatNumber(num: video.viewCount);
+    String resultViewFormat = viewFormat.getFormatNumber();
+
     return Card(
         color: Colors.deepPurpleAccent,
         shape: RoundedRectangleBorder(
@@ -21,7 +26,7 @@ class VideoCard extends StatelessWidget {
         ),
         elevation: 8,
         child: Container(
-          height: 320,
+          height: 342,
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,11 +93,11 @@ class VideoCard extends StatelessWidget {
                                   color: Colors.white,
                                 ),
                               ),
-                              Row(
+                              Wrap(
                                 children: <Widget>[
                                   Text(
-                                    video.author.username.length > 15
-                                        ? video.author.username.substring(0, 15)
+                                    video.author.username.length > 16
+                                        ? video.author.username.substring(0, 16)
                                         : video.author.username,
                                     style: TextStyle(
                                       fontSize: 16,
@@ -107,7 +112,7 @@ class VideoCard extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    video.viewCount,
+                                    resultViewFormat,
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.grey[200],

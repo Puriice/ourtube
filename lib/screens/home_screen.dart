@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 //components
-import '../top_bar.dart';
-import '../second_top_bar.dart';
-import '../nav_bar.dart';
-import '../components/card.dart';
+import 'package:wetube/components/top_bar.dart';
+import 'package:wetube/components/second_top_bar.dart';
+import 'package:wetube/components/nav_bar.dart';
+import 'package:wetube/components/card.dart';
 
 //page
 import 'video_play_screen.dart';

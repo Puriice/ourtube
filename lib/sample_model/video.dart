@@ -9,7 +9,7 @@ class Video {
   final String duration;
   final DateTime timestamp;
   final int viewCount;
-  final String likes;
+  final int likes;
   final String dislikes;
 
   const Video({
@@ -37,11 +37,12 @@ final List<Video> sampleVideos = [
     duration: '1:58',
     timestamp: DateTime(2018, 12, 26),
     viewCount: 28000000,
-    likes: '631K',
+    likes: 631123,
     dislikes: '4',
   ),
   Video(
-    author: sampleUser.singleWhere((user) => user.username == '(G)I-DLE (여자)아이들 (Official YouTube Channel)'),
+    author: sampleUser.singleWhere((user) =>
+        user.username == '(G)I-DLE (여자)아이들 (Official YouTube Channel)'),
     id: 'ATK7gAaZTOM',
     title: '(여자)아이들((G)I-DLE) - 나는 아픈 건 딱 질색이니까(Fate) LIVE CLIP',
     thumbnailUrl:
@@ -50,7 +51,7 @@ final List<Video> sampleVideos = [
     duration: '2:53',
     timestamp: DateTime(2024, 3, 13),
     viewCount: 27000000,
-    likes: '225K',
+    likes: 225423,
     dislikes: '8',
   ),
   Video(
@@ -63,7 +64,7 @@ final List<Video> sampleVideos = [
     duration: '2:59',
     timestamp: DateTime(2022, 8, 24),
     viewCount: 4600000,
-    likes: '97k',
+    likes: 97434,
     dislikes: '4',
   ),
   Video(
@@ -77,7 +78,7 @@ final List<Video> sampleVideos = [
     duration: '19:51',
     timestamp: DateTime(2024, 4, 12),
     viewCount: 326000,
-    likes: '4k',
+    likes: 4342,
     dislikes: '4',
   ),
 ];

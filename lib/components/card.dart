@@ -16,7 +16,7 @@ class VideoCard extends StatelessWidget {
     CalculateTimesPass calculator = CalculateTimesPass(video: video);
     String resultTimePassed = calculator.calculateTimePass();
 
-    FormatNumber viewFormat = FormatNumber(num: video.viewCount);
+    FormatNumberUnitView viewFormat = FormatNumberUnitView(num: video.viewCount);
     String resultViewFormat = viewFormat.getFormatNumber();
 
     return Card(

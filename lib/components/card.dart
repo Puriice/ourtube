@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../sample_model/video.dart';
+import 'package:wetube/sample_model/video.dart';
+
+import 'package:wetube/components/time_pass_calculation.dart';
 
 class VideoCard extends StatelessWidget {
   final Video video;
@@ -9,6 +11,9 @@ class VideoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    CalculateTimesPass calculator = CalculateTimesPass(video: video);
+    String resultTimePassed = calculator.calculateTimePass();
+
     return Card(
         color: Colors.deepPurpleAccent,
         shape: RoundedRectangleBorder(
@@ -86,8 +91,8 @@ class VideoCard extends StatelessWidget {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    video.author.username.length > 17
-                                        ? video.author.username.substring(0, 17)
+                                    video.author.username.length > 15
+                                        ? video.author.username.substring(0, 15)
                                         : video.author.username,
                                     style: TextStyle(
                                       fontSize: 16,
@@ -116,7 +121,7 @@ class VideoCard extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    '1 day ago',
+                                    resultTimePassed,
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.grey[200],

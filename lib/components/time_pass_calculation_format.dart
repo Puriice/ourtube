@@ -1,5 +1,7 @@
 import 'package:wetube/sample_model/video.dart';
 
+//ไม่ตรงเป๊ะ แค่คร่าวๆ
+
 class CalculateTimesPass {
   final Video video;
 

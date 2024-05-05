@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wetube/screens/search_screen.dart';
 
 class NavBar extends StatelessWidget {
   final Color color;
@@ -31,6 +32,13 @@ class NavBar extends StatelessWidget {
             icon: Icon(Icons.account_circle),
           ),
         ],
-        onTap: (int indexOfItem) {});
+        onTap: (int indexOfItem) {
+          if (indexOfItem == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SearchScreen()),
+            );
+          }
+        });
   }
 }

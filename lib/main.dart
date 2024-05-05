@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 
 import 'package:provider/provider.dart';
-import 'providers/current_type_index_provider.dart'; 
+import 'providers/current_type_index_provider.dart';
 
 void main() {
   runApp(

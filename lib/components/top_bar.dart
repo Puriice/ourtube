@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wetube/screens/search_screen.dart';
 
 class FirstTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -32,7 +33,12 @@ class FirstTopBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.search),
           color: color,
           tooltip: 'Search',
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SearchScreen()),
+            );
+          },
         ),
         IconButton(
           icon: const Icon(Icons.settings),

@@ -5,7 +5,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:intl/intl.dart';
 
 //sample data
-import 'package:wetube/sample_model/video.dart';
+import 'package:wetube/model/video.dart';
 
 //format
 import 'package:wetube/components/time_pass_calculation_format.dart';

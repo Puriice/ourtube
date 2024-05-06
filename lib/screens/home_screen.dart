@@ -10,7 +10,7 @@ import 'package:wetube/components/card.dart';
 import 'video_play_screen.dart';
 
 // mock data import
-import 'package:wetube/sample_model/video.dart';
+import 'package:wetube/model/video.dart';
 
 //provider
 import 'package:provider/provider.dart';

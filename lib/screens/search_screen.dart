@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:wetube/components/card.dart';
-import 'package:wetube/sample_model/video.dart';
+import 'package:wetube/model/video.dart';
 import 'package:wetube/screens/video_play_screen.dart';
 
 class SearchScreen extends StatefulWidget {

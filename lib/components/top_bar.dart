@@ -10,8 +10,7 @@ class FirstTopBar extends StatelessWidget implements PreferredSizeWidget {
       {required this.title,
       required this.color,
       required this.bgColor,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   Widget build(BuildContext context) {

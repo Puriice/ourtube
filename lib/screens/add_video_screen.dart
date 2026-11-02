@@ -14,12 +14,14 @@ import 'package:wetube/model/user.dart';
 import 'package:wetube/model/video.dart';
 import 'package:wetube/providers/video_provider.dart';
 
-class add_video_screen extends StatefulWidget {
+class AddVideoScreen extends StatefulWidget {
+  const AddVideoScreen({super.key});
+
   @override
-  _YourPageState createState() => _YourPageState();
+  State<AddVideoScreen> createState() => _AddVideoScreenState();
 }
 
-class _YourPageState extends State<add_video_screen> {
+class _AddVideoScreenState extends State<AddVideoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _urlController = TextEditingController();
   final _titleController = TextEditingController();

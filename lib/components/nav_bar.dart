@@ -6,14 +6,14 @@ class NavBar extends StatelessWidget {
   final dynamic bgColor;
 
   const NavBar({
-    Key? key,
+    super.key,
     required this.color,
     required this.bgColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 75,
       child: BottomNavigationBar(
           currentIndex: 0,
@@ -42,7 +42,7 @@ class NavBar extends StatelessWidget {
             if (indexOfItem == 1) {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => add_video_screen()),
+                MaterialPageRoute(builder: (context) => const AddVideoScreen()),
               );
             }
           }),

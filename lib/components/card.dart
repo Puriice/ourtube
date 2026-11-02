@@ -9,7 +9,7 @@ import 'package:wetube/components/number_format.dart';
 class VideoCard extends StatelessWidget {
   final Video video;
 
-  const VideoCard({Key? key, required this.video}) : super(key: key);
+  const VideoCard({super.key, required this.video});
 
   Widget _thumbnailPlaceholder() {
     return Container(
@@ -63,7 +63,7 @@ class VideoCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5.0),
                       child: Container(
                         padding: const EdgeInsets.all(5.0),
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         child: Text(
                           'Total Time: ${video.duration}', // Replace with your total time
                           style: const TextStyle(

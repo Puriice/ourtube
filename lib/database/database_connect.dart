@@ -18,7 +18,7 @@ class DatabaseHelper {
 
   DatabaseHelper.internal();
 
-  setDB() async {
+  Future<Database> setDB() async {
     io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     String dbPath = path.join(documentDirectory.path, 'db_ourtube_sqflite.db');
     var database = await openDatabase(dbPath,

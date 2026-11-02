@@ -11,12 +11,12 @@ class SecondTopBar extends StatefulWidget {
   final dynamic bgColor;
 
   const SecondTopBar({
-    Key? key,
+    super.key,
     required this.titles,
     required this.sizes,
     required this.color,
     required this.bgColor,
-  }) : super(key: key);
+  });
 
   @override
   SecondTopBarState createState() => SecondTopBarState();

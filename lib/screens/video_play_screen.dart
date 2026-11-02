@@ -17,7 +17,7 @@ import 'package:wetube/components/number_format.dart';
 class VideoPlayScreen extends StatefulWidget {
   final Video video;
 
-  const VideoPlayScreen({Key? key, required this.video}) : super(key: key);
+  const VideoPlayScreen({super.key, required this.video});
 
   @override
   VideoPlayScreenState createState() => VideoPlayScreenState();
@@ -185,7 +185,7 @@ class VideoPlayScreenState extends State<VideoPlayScreen> {
                     ],
                   ),
                 ),
-                Container(
+                SizedBox(
                   height: 50,
                   width: screenWidth,
                   child: Row(

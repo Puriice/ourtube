@@ -19,7 +19,7 @@ import 'package:wetube/providers/video_provider.dart';
 class MainHome extends StatefulWidget {
   final String appTitle;
 
-  const MainHome({Key? key, required this.appTitle}) : super(key: key);
+  const MainHome({super.key, required this.appTitle});
 
   @override
   State<MainHome> createState() => _MainHomeState();

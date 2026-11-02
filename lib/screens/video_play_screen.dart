@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 //pub.dev
+import 'dart:io' as io;
+
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
 
 //sample data
@@ -21,16 +24,93 @@ class VideoPlayScreen extends StatefulWidget {
 }
 
 class VideoPlayScreenState extends State<VideoPlayScreen> {
-  late YoutubePlayerController _controller;
+  // Only one of these is used, depending on where the video comes from.
+  YoutubePlayerController? _controller;
+  VideoPlayerController? _localController;
 
   @override
   void initState() {
     super.initState();
-    _controller = YoutubePlayerController(
-      initialVideoId: widget.video.id,
-      flags: const YoutubePlayerFlags(
-        autoPlay: true,
-        mute: false,
+    if (widget.video.isLocal) {
+      _localController =
+          VideoPlayerController.file(io.File(widget.video.localPath!))
+            ..initialize().then((_) {
+              if (!mounted) return;
+              setState(() {});
+              _localController!.play();
+            });
+    } else {
+      _controller = YoutubePlayerController(
+        initialVideoId: widget.video.id,
+        flags: const YoutubePlayerFlags(
+          autoPlay: true,
+          mute: false,
+        ),
+      );
+    }
+  }
+
+  Widget _buildPlayer(double screenWidth) {
+    if (_controller != null) {
+      return YoutubePlayer(
+        width: screenWidth,
+        controller: _controller!,
+        showVideoProgressIndicator: true,
+        progressIndicatorColor: Colors.red,
+        progressColors: const ProgressBarColors(
+          playedColor: Colors.purple,
+          handleColor: Colors.deepPurple,
+        ),
+      );
+    }
+
+    final controller = _localController!;
+    if (!controller.value.isInitialized) {
+      return Container(
+        width: screenWidth,
+        height: screenWidth * 9 / 16,
+        color: Colors.black,
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    return Container(
+      color: Colors.black,
+      width: screenWidth,
+      height: screenWidth * 9 / 16,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            controller.value.isPlaying ? controller.pause() : controller.play();
+          });
+        },
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Center(
+              child: AspectRatio(
+                aspectRatio: controller.value.aspectRatio,
+                child: VideoPlayer(controller),
+              ),
+            ),
+            ValueListenableBuilder<VideoPlayerValue>(
+              valueListenable: controller,
+              builder: (context, value, child) => value.isPlaying
+                  ? const SizedBox.shrink()
+                  : const Center(
+                      child: Icon(Icons.play_circle_fill,
+                          size: 64, color: Colors.white70),
+                    ),
+            ),
+            VideoProgressIndicator(
+              controller,
+              allowScrubbing: true,
+              colors: const VideoProgressColors(
+                playedColor: Colors.purple,
+                bufferedColor: Colors.white24,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -55,16 +135,7 @@ class VideoPlayScreenState extends State<VideoPlayScreen> {
       ),
       body: Column(
         children: [
-          YoutubePlayer(
-            width: screenWidth,
-            controller: _controller,
-            showVideoProgressIndicator: true,
-            progressIndicatorColor: Colors.red,
-            progressColors: const ProgressBarColors(
-              playedColor: Colors.purple,
-              handleColor: Colors.deepPurple,
-            ),
-          ),
+          _buildPlayer(screenWidth),
           Padding(
             padding: const EdgeInsets.only(left: 10.0, right: 10.0),
             child: Column(
@@ -129,6 +200,12 @@ class VideoPlayScreenState extends State<VideoPlayScreen> {
                             height: 40,
                             width: 40,
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const SizedBox(
+                              height: 40,
+                              width: 40,
+                              child: Icon(Icons.account_circle, size: 40),
+                            ),
                           ),
                         ),
                       ),
@@ -261,7 +338,8 @@ class VideoPlayScreenState extends State<VideoPlayScreen> {
 
   @override
   void dispose() {
+    _controller?.dispose();
+    _localController?.dispose();
     super.dispose();
-    _controller.dispose();
   }
 }

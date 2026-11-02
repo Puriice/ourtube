@@ -9,12 +9,12 @@ import 'package:wetube/components/card.dart';
 //page
 import 'video_play_screen.dart';
 
-// mock data import
 import 'package:wetube/model/video.dart';
 
 //provider
 import 'package:provider/provider.dart';
 import 'package:wetube/providers/current_type_index_provider.dart';
+import 'package:wetube/providers/video_provider.dart';
 
 class MainHome extends StatefulWidget {
   final String appTitle;
@@ -64,54 +64,50 @@ class _MainHomeState extends State<MainHome> {
             margin: const EdgeInsets.only(top: 0.0, bottom: 0.0),
             child: Column(
               children: <Widget>[
-                Expanded(child: Consumer<CurrentTypeIndexProvider>(
-                  builder: (context, currentIndexProvider, child) {
-                    if (currentIndexProvider.current == 0 ||
-                        currentIndexProvider.current == 1) {
-                      return ListView.builder(
-                          itemCount: sampleVideos.length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 4.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => VideoPlayScreen(
-                                              video: sampleVideos[index],
-                                            )),
-                                  );
-                                },
-                                child: VideoCard(video: sampleVideos[index]),
-                              ),
-                            );
-                          });
-                    } else {
-                      return ListView.builder(
-                          itemCount: sampleVideos.length,
-                          itemBuilder: (context, index) {
-                            if (types[currentIndexProvider.current] ==
-                                sampleVideos[index].type) {
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 4.0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => VideoPlayScreen(
-                                                video: sampleVideos[index],
-                                              )),
-                                    );
-                                  },
-                                  child: VideoCard(video: sampleVideos[index]),
-                                ),
-                              );
-                            }
-                            return Container();
-                          });
+                Expanded(child:
+                    Consumer2<CurrentTypeIndexProvider, VideoProvider>(
+                  builder: (context, currentIndexProvider, videoProvider,
+                      child) {
+                    if (videoProvider.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
                     }
+
+                    List<Video> videos = videoProvider.videos;
+                    if (currentIndexProvider.current > 1) {
+                      videos = videos
+                          .where((video) =>
+                              video.type == types[currentIndexProvider.current])
+                          .toList();
+                    }
+
+                    if (videos.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No videos yet. Tap + to add videos.',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                        itemCount: videos.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 4.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => VideoPlayScreen(
+                                            video: videos[index],
+                                          )),
+                                );
+                              },
+                              child: VideoCard(video: videos[index]),
+                            ),
+                          );
+                        });
                   },
                 )),
               ],

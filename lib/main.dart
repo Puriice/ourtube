@@ -5,11 +5,16 @@ import 'screens/home_screen.dart';
 
 import 'package:provider/provider.dart';
 import 'providers/current_type_index_provider.dart';
+import 'providers/video_provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => CurrentTypeIndexProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CurrentTypeIndexProvider()),
+        ChangeNotifierProvider(
+            create: (context) => VideoProvider()..loadVideos()),
+      ],
       child: const MainApp(),
     ),
   );

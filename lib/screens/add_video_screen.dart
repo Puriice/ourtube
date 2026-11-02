@@ -1,6 +1,18 @@
+import 'dart:io' as io;
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+
 import 'package:wetube/database/database_connect.dart';
+import 'package:wetube/database/service/vdo_service.dart';
+import 'package:wetube/model/user.dart';
 import 'package:wetube/model/video.dart';
+import 'package:wetube/providers/video_provider.dart';
 
 class add_video_screen extends StatefulWidget {
   @override
@@ -8,46 +20,151 @@ class add_video_screen extends StatefulWidget {
 }
 
 class _YourPageState extends State<add_video_screen> {
+  final _formKey = GlobalKey<FormState>();
+  final _urlController = TextEditingController();
+  final _titleController = TextEditingController();
+  final _durationController = TextEditingController();
+
+  final List<String> _types = ['Music', 'News', 'Animal', 'Gaming', 'Sport'];
+
+  String _source = 'youtube';
+  String _type = 'Music';
+  User _author = sampleUser.first;
+  XFile? _pickedFile;
+  bool _isUploading = false;
+
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    _urlController.dispose();
+    _titleController.dispose();
+    _durationController.dispose();
+    super.dispose();
   }
 
-  Future<void> insertData() async {
-    final dbConnect = DatabaseHelper();
-    final db = await dbConnect.db;
+  Future<void> _pickVideo() async {
+    final file = await ImagePicker().pickVideo(source: ImageSource.gallery);
+    if (file == null) return;
+    setState(() => _pickedFile = file);
+  }
 
-    for (var video in sampleVideos) {
-      final existingData =
-          await db.rawQuery('SELECT * FROM Video WHERE id = ?', [video.id]);
-      if (existingData.isNotEmpty) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _showAlert(context);
-        });
+  String _formatDuration(Duration d) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final seconds = twoDigits(d.inSeconds % 60);
+    if (d.inHours > 0) {
+      return '${d.inHours}:${twoDigits(d.inMinutes % 60)}:$seconds';
+    }
+    return '${d.inMinutes}:$seconds';
+  }
+
+  // The picker returns a file in the cache folder, which Android may clear,
+  // so copy it into the app's documents folder.
+  Future<String> _copyToAppFolder(XFile file) async {
+    final docs = await getApplicationDocumentsDirectory();
+    final videoDir = io.Directory(path.join(docs.path, 'videos'));
+    await videoDir.create(recursive: true);
+    final newPath = path.join(videoDir.path,
+        '${DateTime.now().millisecondsSinceEpoch}${path.extension(file.path)}');
+    await io.File(file.path).copy(newPath);
+    return newPath;
+  }
+
+  Future<String> _readDuration(String filePath) async {
+    final controller = VideoPlayerController.file(io.File(filePath));
+    try {
+      await controller.initialize();
+      return _formatDuration(controller.value.duration);
+    } finally {
+      await controller.dispose();
+    }
+  }
+
+  Future<void> _upload() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_source == 'local' && _pickedFile == null) {
+      _showMessage('Please choose a video first.');
+      return;
+    }
+
+    setState(() => _isUploading = true);
+    try {
+      Video video;
+      if (_source == 'youtube') {
+        final videoId = _youtubeId(_urlController.text)!;
+        video = Video(
+          id: videoId,
+          author: _author,
+          title: _titleController.text.trim(),
+          thumbnailUrl: 'https://i.ytimg.com/vi/$videoId/hqdefault.jpg',
+          type: _type,
+          duration: _durationController.text.trim().isEmpty
+              ? '-'
+              : _durationController.text.trim(),
+          timestamp: DateTime.now(),
+          viewCount: 0,
+          likes: 0,
+          dislikes: '0',
+        );
       } else {
-        await db.rawInsert(
-          'INSERT INTO Video(id, author, title, thumbnailUrl, type, duration, timestamp, viewCount, likes, dislikes) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-          [
-            video.id,
-            video.author.username,
-            video.title,
-            video.thumbnailUrl,
-            video.type,
-            video.duration,
-            video.timestamp.toIso8601String(),
-            video.viewCount,
-            video.likes,
-            video.dislikes
-          ],
+        final localPath = await _copyToAppFolder(_pickedFile!);
+        video = Video(
+          id: 'local_${DateTime.now().millisecondsSinceEpoch}',
+          author: _author,
+          title: _titleController.text.trim(),
+          thumbnailUrl: '',
+          type: _type,
+          duration: await _readDuration(localPath),
+          timestamp: DateTime.now(),
+          viewCount: 0,
+          likes: 0,
+          dislikes: '0',
+          source: 'local',
+          localPath: localPath,
         );
       }
+
+      final inserted = await insertVideo(video);
+      if (!mounted) return;
+      if (!inserted) {
+        _showAlert(context);
+        return;
+      }
+      await context.read<VideoProvider>().loadVideos();
+      if (!mounted) return;
+      _showMessage('Video uploaded.');
+      Navigator.pop(context);
+    } catch (e) {
+      _showMessage('Upload failed: $e');
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
     }
   }
 
   Future<void> deleteAllData() async {
     final dbConnect = DatabaseHelper();
     final db = await dbConnect.db;
+    // Remove the copied video files too, not just the rows.
+    final localVideos = await db.query('Video',
+        columns: ['localPath'], where: 'localPath IS NOT NULL');
+    for (final row in localVideos) {
+      final file = io.File(row['localPath'] as String);
+      if (await file.exists()) await file.delete();
+    }
     await db.rawDelete('DELETE FROM Video');
+    if (!mounted) return;
+    context.read<VideoProvider>().loadVideos();
+    _showMessage('All videos deleted.');
+  }
+
+  // Accepts a full YouTube URL or a bare 11-character video id.
+  String? _youtubeId(String input) {
+    final text = input.trim();
+    if (RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch(text)) return text;
+    return YoutubePlayer.convertUrlToId(text);
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -67,25 +184,146 @@ class _YourPageState extends State<add_video_screen> {
           ),
         ),
         title: Text(
-          'Add Video Screen',
+          'Upload Video',
           style: TextStyle(
-            color: textColor, // Change this to your desired color
+            color: textColor,
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
           children: <Widget>[
-            ElevatedButton(
-              child: Text('Insert Data'),
-              onPressed: insertData,
+            SegmentedButton<String>(
+              segments: const [
+                ButtonSegment(
+                  value: 'youtube',
+                  label: Text('YouTube link'),
+                  icon: Icon(Icons.link),
+                ),
+                ButtonSegment(
+                  value: 'local',
+                  label: Text('From phone'),
+                  icon: Icon(Icons.phone_android),
+                ),
+              ],
+              selected: {_source},
+              onSelectionChanged: (selection) {
+                setState(() => _source = selection.first);
+              },
             ),
-            SizedBox(height: 20), // Add some spacing between the buttons
-            ElevatedButton(
-              child: Text('Delete All Data'),
-              onPressed: deleteAllData,
-            )
+            const SizedBox(height: 20),
+            if (_source == 'youtube') ...[
+              TextFormField(
+                controller: _urlController,
+                decoration: const InputDecoration(
+                  labelText: 'YouTube URL',
+                  hintText: 'https://www.youtube.com/watch?v=...',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (_youtubeId(value ?? '') == null) {
+                    return 'Please enter a valid YouTube link.';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _durationController,
+                decoration: const InputDecoration(
+                  labelText: 'Duration (optional)',
+                  hintText: 'e.g. 3:45',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  final text = value?.trim() ?? '';
+                  if (text.isNotEmpty &&
+                      !RegExp(r'^\d{1,2}(:\d{2}){1,2}$').hasMatch(text)) {
+                    return 'Use the format m:ss or h:mm:ss.';
+                  }
+                  return null;
+                },
+              ),
+            ] else ...[
+              OutlinedButton.icon(
+                onPressed: _isUploading ? null : _pickVideo,
+                icon: const Icon(Icons.video_library),
+                label: Text(_pickedFile == null
+                    ? 'Choose video from phone'
+                    : 'Change video'),
+              ),
+              if (_pickedFile != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'Selected: ${_pickedFile!.name}',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+            ],
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'Title',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please enter a title.';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              initialValue: _type,
+              decoration: const InputDecoration(
+                labelText: 'Category',
+                border: OutlineInputBorder(),
+              ),
+              items: _types
+                  .map((type) =>
+                      DropdownMenuItem(value: type, child: Text(type)))
+                  .toList(),
+              onChanged: (value) => setState(() => _type = value!),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<User>(
+              initialValue: _author,
+              isExpanded: true,
+              decoration: const InputDecoration(
+                labelText: 'Channel',
+                border: OutlineInputBorder(),
+              ),
+              items: sampleUser
+                  .map((user) => DropdownMenuItem(
+                        value: user,
+                        child: Text(user.username,
+                            overflow: TextOverflow.ellipsis),
+                      ))
+                  .toList(),
+              onChanged: (value) => setState(() => _author = value!),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: _isUploading ? null : _upload,
+              icon: _isUploading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.cloud_upload),
+              label: Text(_isUploading ? 'Uploading...' : 'Upload'),
+            ),
+            const SizedBox(height: 32),
+            TextButton(
+              onPressed: _isUploading ? null : deleteAllData,
+              child: const Text('Delete All Data'),
+            ),
           ],
         ),
       ),
@@ -99,7 +337,7 @@ void _showAlert(BuildContext context) {
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text('Alert'),
-        content: Text('Data with the same id already exists.'),
+        content: Text('This video has already been uploaded.'),
         actions: <Widget>[
           TextButton(
             child: Text('OK'),

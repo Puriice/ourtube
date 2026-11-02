@@ -21,12 +21,25 @@ class DatabaseHelper {
   setDB() async {
     io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     String dbPath = path.join(documentDirectory.path, 'db_ourtube_sqflite.db');
-    var database = await openDatabase(dbPath, version: 1, onCreate: _onCreatingDatabase);
+    var database = await openDatabase(dbPath,
+        version: 2,
+        onCreate: _onCreatingDatabase,
+        onUpgrade: _onUpgradingDatabase);
     return database;
   }
 
-  void _onCreatingDatabase(Database db, int version) async {
+  Future<void> _onCreatingDatabase(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE Video(id TEXT PRIMARY KEY, author TEXT, title TEXT, thumbnailUrl TEXT, type TEXT, duration TEXT, timestamp TEXT, viewCount INTEGER, likes INTEGER, dislikes INTEGER)");
+        "CREATE TABLE Video(id TEXT PRIMARY KEY, author TEXT, title TEXT, thumbnailUrl TEXT, type TEXT, duration TEXT, timestamp TEXT, viewCount INTEGER, likes INTEGER, dislikes INTEGER, source TEXT DEFAULT 'youtube', localPath TEXT)");
+  }
+
+  // Version 2 adds uploaded videos: source ('youtube' or 'local') and the
+  // path of the copied video file.
+  Future<void> _onUpgradingDatabase(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+          "ALTER TABLE Video ADD COLUMN source TEXT DEFAULT 'youtube'");
+      await db.execute("ALTER TABLE Video ADD COLUMN localPath TEXT");
+    }
   }
 }

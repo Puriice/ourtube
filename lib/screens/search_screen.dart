@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:wetube/components/card.dart';
 import 'package:wetube/model/video.dart';
+import 'package:wetube/database/service/vdo_service.dart';
 import 'package:wetube/screens/video_play_screen.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -56,17 +57,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           },
                         ),
                       ),
-                      onSubmitted: (String value) {
+                      onSubmitted: (String value) async {
+                        final result = await searchVideosFromDatabase(value);
                         setState(() {
-                          debugPrint(value);
-
-                          _result = sampleVideos
-                              .where((vdo) => vdo.title
-                                  .toLowerCase()
-                                  .contains(value.toLowerCase()))
-                              .toList();
-
-                          debugPrint(_result.toString());
+                          _result = result;
                         });
                       },
                     ),

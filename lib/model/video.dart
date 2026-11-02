@@ -11,6 +11,10 @@ class Video {
   final int viewCount;
   final int likes;
   final String dislikes;
+  // 'youtube' plays [id] with the YouTube player,
+  // 'local' plays the file at [localPath] with video_player.
+  final String source;
+  final String? localPath;
 
   const Video({
     required this.id,
@@ -23,7 +27,11 @@ class Video {
     required this.viewCount,
     required this.likes,
     required this.dislikes,
+    this.source = 'youtube',
+    this.localPath,
   });
+
+  bool get isLocal => source == 'local';
 }
 
 final List<Video> sampleVideos = [

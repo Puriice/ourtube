@@ -1,83 +1,70 @@
-// import 'package:flutter/material.dart';
-// import 'package:wetube/database/database_connect.dart';
-// import 'package:wetube/model/video_model.dart';
-// import 'package:wetube/model/user.dart';
+import 'package:wetube/database/database_connect.dart';
+import 'package:wetube/model/user.dart';
+import 'package:wetube/model/video.dart';
 
+// The Video table only stores the author's username, so look up the full
+// User (profile image, subscribers) from sampleUser.
+User _findAuthor(String username) {
+  return sampleUser.firstWhere(
+    (user) => user.username == username,
+    orElse: () => User(username: username, profileImageUrl: '', subscribers: '0'),
+  );
+}
 
-// Future<List<Video>> fetchVideosFromDatabase() async {
-//   final dbConnect = DatabaseHelper();
-//   final db = await dbConnect.db;
-//   final List<Map<String, dynamic>> maps = await db.query('Video');
+Video _videoFromMap(Map<String, dynamic> map) {
+  return Video(
+    id: map['id'],
+    author: _findAuthor(map['author']),
+    title: map['title'],
+    thumbnailUrl: map['thumbnailUrl'],
+    type: map['type'],
+    duration: map['duration'],
+    timestamp: DateTime.parse(map['timestamp']),
+    viewCount: map['viewCount'],
+    likes: map['likes'],
+    dislikes: map['dislikes'].toString(),
+    source: map['source'] ?? 'youtube',
+    localPath: map['localPath'],
+  );
+}
 
-//   return List.generate(maps.length, (i) {
-//     return Video(
-//       id: maps[i]['id'],
-//       authorId: sampleUser.singleWhere((user) => user.username == maps[i]['author']).username,,
-//       title: maps[i]['title'],
-//       thumbnailUrl: maps[i]['thumbnailUrl'],
-//       type: maps[i]['type'],
-//       duration: maps[i]['duration'],
-//       timestamp: DateTime.parse(maps[i]['timestamp']),
-//       viewCount: maps[i]['viewCount'],
-//       likes: maps[i]['likes'],
-//       dislikes: maps[i]['dislikes'],
-//     );
-//   });
-// }
+// Returns false if a video with the same id already exists.
+Future<bool> insertVideo(Video video) async {
+  final db = await DatabaseHelper().db;
+  final existing =
+      await db.query('Video', where: 'id = ?', whereArgs: [video.id]);
+  if (existing.isNotEmpty) return false;
 
-// Future<void> insertData() async {
-//     final dbConnect = DatabaseHelper();
-//     final db = await dbConnect.db;
+  await db.insert('Video', {
+    'id': video.id,
+    'author': video.author.username,
+    'title': video.title,
+    'thumbnailUrl': video.thumbnailUrl,
+    'type': video.type,
+    'duration': video.duration,
+    'timestamp': video.timestamp.toIso8601String(),
+    'viewCount': video.viewCount,
+    'likes': video.likes,
+    'dislikes': video.dislikes,
+    'source': video.source,
+    'localPath': video.localPath,
+  });
+  return true;
+}
 
-//     for (var video in sampleVideos) {
-//       final existingData =
-//           await db.rawQuery('SELECT * FROM Video WHERE id = ?', [video.id]);
-//       if (existingData.isNotEmpty) {
-//         WidgetsBinding.instance.addPostFrameCallback((_) {
-//           _showAlert(context);
-//         });
-//       } else {
-//         await db.rawInsert(
-//           'INSERT INTO Video(id, author, title, thumbnailUrl, type, duration, timestamp, viewCount, likes, dislikes) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-//           [
-//             video.id,
-//             video.author.username,
-//             video.title,
-//             video.thumbnailUrl,
-//             video.type,
-//             video.duration,
-//             video.timestamp.toIso8601String(),
-//             video.viewCount,
-//             video.likes,
-//             video.dislikes
-//           ],
-//         );
-//       }
-//     }
-// }
+Future<List<Video>> fetchVideosFromDatabase() async {
+  final db = await DatabaseHelper().db;
+  final maps = await db.query('Video', orderBy: 'timestamp DESC');
+  return maps.map(_videoFromMap).toList();
+}
 
-// Future<void> deleteAllData() async {
-//     final dbConnect = DatabaseHelper();
-//     final db = await dbConnect.db;
-//     await db.rawDelete('DELETE FROM Video');
-// }
-
-// void _showAlert(BuildContext context) {
-//   showDialog(
-//     context: context,
-//     builder: (BuildContext context) {
-//       return AlertDialog(
-//         title: Text('Alert'),
-//         content: Text('Data with the same id already exists.'),
-//         actions: <Widget>[
-//           TextButton(
-//             child: Text('OK'),
-//             onPressed: () {
-//               Navigator.of(context).pop();
-//             },
-//           ),
-//         ],
-//       );
-//     },
-//   );
-// }
+Future<List<Video>> searchVideosFromDatabase(String keyword) async {
+  final db = await DatabaseHelper().db;
+  final maps = await db.query(
+    'Video',
+    where: 'title LIKE ?',
+    whereArgs: ['%$keyword%'],
+    orderBy: 'timestamp DESC',
+  );
+  return maps.map(_videoFromMap).toList();
+}

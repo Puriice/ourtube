@@ -11,6 +11,15 @@ class VideoCard extends StatelessWidget {
 
   const VideoCard({Key? key, required this.video}) : super(key: key);
 
+  Widget _thumbnailPlaceholder() {
+    return Container(
+      height: 200,
+      width: double.infinity,
+      color: Colors.blueGrey[900],
+      child: const Icon(Icons.movie, size: 80, color: Colors.white70),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     CalculateTimesPass calculator = CalculateTimesPass(video: video);
@@ -36,12 +45,16 @@ class VideoCard extends StatelessWidget {
                   ClipRRect(
                     borderRadius:
                         BorderRadius.circular(12.0), // Add rounded corners here
-                    child: Image.network(
-                      video.thumbnailUrl,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                    child: video.isLocal
+                        ? _thumbnailPlaceholder()
+                        : Image.network(
+                            video.thumbnailUrl,
+                            height: 200,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                _thumbnailPlaceholder(),
+                          ),
                   ),
                   Positioned(
                     bottom: 10.0,
@@ -75,6 +88,12 @@ class VideoCard extends StatelessWidget {
                         height: 50,
                         width: 50,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: Icon(Icons.account_circle, size: 50),
+                        ),
                       ),
                     ),
                     Expanded(

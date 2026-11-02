@@ -1,55 +1,64 @@
 # OurTube
 
-แอปดูและอัปโหลดวิดีโอ สร้างด้วย Flutter (โปรเจกต์รายวิชา CP213)
-เก็บข้อมูลทั้งหมดไว้ในเครื่องด้วย SQLite ไม่ต้องใช้เซิร์ฟเวอร์
+A Flutter app for watching and uploading videos, built as a CP213 course project.
+All data is stored on the phone with SQLite, so no server is needed.
 
-## ภาพการใช้งาน
+## Why we built it
 
-| หน้าแรก | เล่นวิดีโอ | กรองตามหมวดหมู่ |
+We built OurTube for people who want to avoid ads on YouTube. Instead of browsing YouTube
+itself, you keep your own list of videos: save the YouTube links you want to watch and
+upload videos from your phone, all in one place.
+
+> **Note:** YouTube videos play through YouTube's official embedded player, so YouTube
+> may still show ads on some of them. Videos uploaded from your phone never have ads.
+
+## Screenshots
+
+| Home | Video player | Category filter |
 | :---: | :---: | :---: |
 | <img src="docs/screenshots/01_home.png" width="250"> | <img src="docs/screenshots/02_play.png" width="250"> | <img src="docs/screenshots/03_category.png" width="250"> |
-| รายการวิดีโอเรียงจากใหม่ไปเก่า พร้อมชื่อช่อง ยอดวิว และเวลาที่อัปโหลด | กดที่วิดีโอเพื่อเปิดหน้าเล่น ดูรายละเอียดและปุ่ม Like / Share / Download | กดแท็บ All, Music, News, Animal ฯลฯ เพื่อกรองวิดีโอ |
+| Videos sorted from newest to oldest, with channel name, views and upload time | Tap a video to open it and see its details and the Like / Share / Download buttons | Tap All, Music, News, Animal, etc. to filter videos |
 
-| ค้นหา | อัปโหลดวิดีโอ | โปรไฟล์ |
+| Search | Upload | Profile |
 | :---: | :---: | :---: |
 | <img src="docs/screenshots/04_search.png" width="250"> | <img src="docs/screenshots/05_upload.png" width="250"> | <img src="docs/screenshots/06_profile.png" width="250"> |
-| กดไอคอนแว่นขยาย พิมพ์คำค้นแล้วกด Enter | กดปุ่ม ⊕ ตรงกลางแถบล่าง วางลิงก์ YouTube หรือเลือกไฟล์จากเครื่อง | กดแท็บ Profile ดูวิดีโอที่เราอัปโหลด เปลี่ยนชื่อและรูปโปรไฟล์ |
+| Tap the search icon, type a keyword and press Enter | Tap ⊕ in the bottom bar, then paste a YouTube link or pick a file from your phone | Tap the Profile tab to see your uploads and change your name and picture |
 
-| ตั้งค่า | Dark mode |
+| Settings | Dark mode |
 | :---: | :---: |
 | <img src="docs/screenshots/07_settings.png" width="250"> | <img src="docs/screenshots/08_dark.png" width="250"> |
-| กดไอคอนเฟืองมุมขวาบน | เปิด Dark mode ได้จากหน้าตั้งค่า |
+| Tap the gear icon in the top-right corner | Turn on dark mode from the settings screen |
 
-## ฟีเจอร์
+## Features
 
-**ดูวิดีโอ**
-- แสดงรายการวิดีโอพร้อมภาพปก ความยาว ยอดวิว (เช่น 28M) และเวลาที่ผ่านมา (เช่น 7 years ago)
-- เล่นวิดีโอ YouTube ด้วย `youtube_player_flutter` และวิดีโอจากเครื่องด้วย `video_player`
-- วิดีโอที่มาจากลิงก์ YouTube มีป้าย **▶ YouTube** สีแดงบนการ์ดและหน้าเล่น
-- กรองวิดีโอตามหมวดหมู่ และค้นหาจากชื่อวิดีโอ
+**Watching videos**
+- Video list with thumbnail, duration, view count (for example 28M) and time since upload (for example 7 years ago)
+- YouTube videos play with `youtube_player_flutter`; videos from your phone play with `video_player`
+- Videos added from a YouTube link have a red **▶ YouTube** tag on the card and the player screen
+- Filter videos by category and search by title
 
-**อัปโหลดวิดีโอ**
-- **YouTube link:** วางลิงก์ (หรือ ID 11 ตัว) แอปดึงภาพปกให้อัตโนมัติ
-- **From phone:** เลือกวิดีโอจากแกลเลอรี แอปอ่านความยาวให้อัตโนมัติ และคัดลอกไฟล์ไปเก็บในโฟลเดอร์ของแอป
-- วิดีโอที่อัปโหลดเป็นของโปรไฟล์เราเอง ไม่ต้องเลือกช่อง
+**Uploading videos**
+- **YouTube link:** paste a link (or the 11-character video ID) and the thumbnail is fetched automatically
+- **From phone:** pick a video from your gallery; the app reads its duration and copies the file into the app's folder
+- Uploaded videos belong to your profile, so there's no channel to choose
 
-**โปรไฟล์**
-- เปลี่ยนชื่อ (กดดินสอ) และรูปโปรไฟล์ (แตะที่รูป)
-- ดูรายการวิดีโอที่เราอัปโหลด กดค้างที่วิดีโอเพื่อลบ
+**Profile**
+- Change your name (tap the pencil) and profile picture (tap the picture)
+- See the videos you uploaded; long-press a video to delete it
 
-**ตั้งค่า**
-- **Dark mode:** เปิด/ปิดธีมมืด
-- **Autoplay:** เล่นวิดีโอทันทีเมื่อเปิด
-- **Delete all videos:** ลบวิดีโอทั้งหมด (ทั้งข้อมูลใน database และไฟล์ที่คัดลอกไว้)
-- ค่าที่ตั้งถูกจำไว้ด้วย `shared_preferences` แม้ปิดแอปแล้วเปิดใหม่
+**Settings**
+- **Dark mode:** switch between light and dark themes
+- **Autoplay:** start playing as soon as a video opens
+- **Delete all videos:** removes every video, including the copied files
+- Settings are saved with `shared_preferences`, so they stay after you close the app
 
-## สิ่งที่ต้องมี
+## Requirements
 
-- Flutter 3.47 ขึ้นไป (Dart 3.13+)
-- Android SDK + JDK 17 ขึ้นไป (ใช้ JDK ที่มากับ Android Studio ได้)
-- Android Gradle Plugin 8.11 / Gradle 8.14 (ตั้งค่าไว้ในโปรเจกต์แล้ว)
+- Flutter 3.47 or later (Dart 3.13+)
+- Android SDK and JDK 17 or later (the JDK bundled with Android Studio works)
+- Android Gradle Plugin 8.11 / Gradle 8.14 (already set up in the project)
 
-## วิธีรัน
+## Getting started
 
 ```bash
 git clone https://github.com/Puriice/ourtube.git
@@ -58,24 +67,25 @@ flutter pub get
 flutter run
 ```
 
-เปิดแอปครั้งแรก database ยังว่าง หน้าแรกจะขึ้นว่า *No videos yet* ให้กดปุ่ม ⊕ แล้วอัปโหลดวิดีโอก่อน
+The database is empty the first time you open the app, so the home screen shows *No videos yet*.
+Tap ⊕ to upload your first video.
 
-> **หมายเหตุ:** ถ้าเปิดโปรเจกต์ใน VS Code แล้วมีส่วนขยาย Java/Gradle ติดตั้งอยู่ ส่วนขยายอาจแก้ไฟล์
-> `android/gradle/wrapper/gradle-wrapper.properties` เป็น Gradle 9.x ซึ่งใช้กับ AGP 8 ไม่ได้
-> ถ้า build ไม่ผ่าน ให้ตรวจว่า `distributionUrl` ยังเป็น `gradle-8.14.3-all.zip`
+> **Note:** If you open the project in VS Code with a Java/Gradle extension installed, the extension
+> may change `android/gradle/wrapper/gradle-wrapper.properties` to Gradle 9.x, which doesn't work
+> with AGP 8. If the build fails, check that `distributionUrl` still points to `gradle-8.14.3-all.zip`.
 
-## โครงสร้างโปรเจกต์
+## Project structure
 
 ```
 lib/
-├── main.dart                 # จุดเริ่มต้นของแอป ธีม และ provider
-├── screens/                  # หน้าจอ: home, video_play, search, add_video, profile, settings
-├── components/               # วิดเจ็ตย่อย: card, top_bar, nav_bar, user_avatar, youtube_tag, ตัวจัดรูปแบบตัวเลข/เวลา
-├── model/                    # โมเดล Video, User
-├── providers/                # state: หมวดหมู่ที่เลือก, รายการวิดีโอ/โปรไฟล์, ค่า settings
-└── database/                 # การเชื่อมต่อ SQLite และ service สำหรับวิดีโอและโปรไฟล์
+├── main.dart                 # App entry point, themes and providers
+├── screens/                  # Screens: home, video_play, search, add_video, profile, settings
+├── components/               # Widgets: card, top_bar, nav_bar, user_avatar, youtube_tag, number/time formatters
+├── model/                    # Video and User models
+├── providers/                # State: selected category, videos and profile, settings
+└── database/                 # SQLite connection and services for videos and the profile
 ```
 
-**Database (SQLite)** มี 2 ตาราง:
-- `Video` เก็บข้อมูลวิดีโอ คอลัมน์ `source` บอกว่ามาจาก `youtube` หรือ `local` และ `localPath` เก็บที่อยู่ไฟล์ของวิดีโอจากเครื่อง
-- `Profile` เก็บชื่อและรูปโปรไฟล์ของเรา
+**Database (SQLite)** has two tables:
+- `Video` stores the videos. The `source` column is `youtube` or `local`, and `localPath` holds the file path of videos uploaded from the phone.
+- `Profile` stores your name and profile picture.

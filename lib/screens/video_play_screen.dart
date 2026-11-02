@@ -5,6 +5,8 @@ import 'dart:io' as io;
 
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:video_player/video_player.dart';
+import 'package:provider/provider.dart';
+import 'package:wetube/providers/settings_provider.dart';
 import 'package:intl/intl.dart';
 
 //sample data
@@ -13,6 +15,8 @@ import 'package:wetube/model/video.dart';
 //format
 import 'package:wetube/components/time_pass_calculation_format.dart';
 import 'package:wetube/components/number_format.dart';
+import 'package:wetube/components/user_avatar.dart';
+import 'package:wetube/components/youtube_tag.dart';
 
 class VideoPlayScreen extends StatefulWidget {
   final Video video;
@@ -31,19 +35,20 @@ class VideoPlayScreenState extends State<VideoPlayScreen> {
   @override
   void initState() {
     super.initState();
+    final autoplay = context.read<SettingsProvider>().autoplay;
     if (widget.video.isLocal) {
       _localController =
           VideoPlayerController.file(io.File(widget.video.localPath!))
             ..initialize().then((_) {
               if (!mounted) return;
               setState(() {});
-              _localController!.play();
+              if (autoplay) _localController!.play();
             });
     } else {
       _controller = YoutubePlayerController(
         initialVideoId: widget.video.id,
-        flags: const YoutubePlayerFlags(
-          autoPlay: true,
+        flags: YoutubePlayerFlags(
+          autoPlay: autoplay,
           mute: false,
         ),
       );
@@ -152,7 +157,6 @@ class VideoPlayScreenState extends State<VideoPlayScreen> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Colors.black,
                             fontSize: 20.0,
                             fontWeight: FontWeight.bold,
                           ),
@@ -167,6 +171,11 @@ class VideoPlayScreenState extends State<VideoPlayScreen> {
                   margin: const EdgeInsets.only(bottom: 5.0),
                   child: Row(
                     children: [
+                      if (!widget.video.isLocal)
+                        const Padding(
+                          padding: EdgeInsets.only(right: 10.0),
+                          child: YoutubeTag(),
+                        ),
                       Padding(
                         padding: const EdgeInsets.only(right: 10.0),
                         child: Text(
@@ -192,22 +201,7 @@ class VideoPlayScreenState extends State<VideoPlayScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(right: 15.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              50.0), // Add rounded corners here
-                          child: Image.network(
-                            widget.video.author.profileImageUrl,
-                            height: 40,
-                            width: 40,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const SizedBox(
-                              height: 40,
-                              width: 40,
-                              child: Icon(Icons.account_circle, size: 40),
-                            ),
-                          ),
-                        ),
+                        child: UserAvatar(user: widget.video.author, size: 40),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(right: 10.0),

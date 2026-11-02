@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wetube/screens/search_screen.dart';
+import 'package:wetube/screens/settings_screen.dart';
 
 class FirstTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -43,7 +44,12 @@ class FirstTopBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.settings),
           color: color,
           tooltip: 'Settings',
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
+            );
+          },
         ),
       ],
     );

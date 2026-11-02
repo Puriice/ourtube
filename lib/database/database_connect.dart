@@ -22,7 +22,7 @@ class DatabaseHelper {
     io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     String dbPath = path.join(documentDirectory.path, 'db_ourtube_sqflite.db');
     var database = await openDatabase(dbPath,
-        version: 2,
+        version: 3,
         onCreate: _onCreatingDatabase,
         onUpgrade: _onUpgradingDatabase);
     return database;
@@ -31,6 +31,12 @@ class DatabaseHelper {
   Future<void> _onCreatingDatabase(Database db, int version) async {
     await db.execute(
         "CREATE TABLE Video(id TEXT PRIMARY KEY, author TEXT, title TEXT, thumbnailUrl TEXT, type TEXT, duration TEXT, timestamp TEXT, viewCount INTEGER, likes INTEGER, dislikes INTEGER, source TEXT DEFAULT 'youtube', localPath TEXT)");
+    await _createProfileTable(db);
+  }
+
+  Future<void> _createProfileTable(Database db) async {
+    await db.execute(
+        "CREATE TABLE Profile(id INTEGER PRIMARY KEY, username TEXT, imagePath TEXT)");
   }
 
   // Version 2 adds uploaded videos: source ('youtube' or 'local') and the
@@ -40,6 +46,10 @@ class DatabaseHelper {
       await db.execute(
           "ALTER TABLE Video ADD COLUMN source TEXT DEFAULT 'youtube'");
       await db.execute("ALTER TABLE Video ADD COLUMN localPath TEXT");
+    }
+    // Version 3 adds the user's own profile.
+    if (oldVersion < 3) {
+      await _createProfileTable(db);
     }
   }
 }

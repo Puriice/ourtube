@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wetube/screens/add_video_screen.dart';
+import 'package:wetube/screens/profile_screen.dart';
 
 class NavBar extends StatelessWidget {
   final Color color;
@@ -43,6 +44,11 @@ class NavBar extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AddVideoScreen()),
+              );
+            } else if (indexOfItem == 2) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
               );
             }
           }),

@@ -8,9 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import 'package:wetube/database/database_connect.dart';
 import 'package:wetube/database/service/vdo_service.dart';
-import 'package:wetube/model/user.dart';
 import 'package:wetube/model/video.dart';
 import 'package:wetube/providers/video_provider.dart';
 
@@ -31,7 +29,6 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
 
   String _source = 'youtube';
   String _type = 'Music';
-  User _author = sampleUser.first;
   XFile? _pickedFile;
   bool _isUploading = false;
 
@@ -88,13 +85,15 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
     }
 
     setState(() => _isUploading = true);
+    // Uploaded videos always belong to the user's own profile.
+    final me = context.read<VideoProvider>().me;
     try {
       Video video;
       if (_source == 'youtube') {
         final videoId = _youtubeId(_urlController.text)!;
         video = Video(
           id: videoId,
-          author: _author,
+          author: me,
           title: _titleController.text.trim(),
           thumbnailUrl: 'https://i.ytimg.com/vi/$videoId/hqdefault.jpg',
           type: _type,
@@ -110,7 +109,7 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
         final localPath = await _copyToAppFolder(_pickedFile!);
         video = Video(
           id: 'local_${DateTime.now().millisecondsSinceEpoch}',
-          author: _author,
+          author: me,
           title: _titleController.text.trim(),
           thumbnailUrl: '',
           type: _type,
@@ -139,22 +138,6 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
     } finally {
       if (mounted) setState(() => _isUploading = false);
     }
-  }
-
-  Future<void> deleteAllData() async {
-    final dbConnect = DatabaseHelper();
-    final db = await dbConnect.db;
-    // Remove the copied video files too, not just the rows.
-    final localVideos = await db.query('Video',
-        columns: ['localPath'], where: 'localPath IS NOT NULL');
-    for (final row in localVideos) {
-      final file = io.File(row['localPath'] as String);
-      if (await file.exists()) await file.delete();
-    }
-    await db.rawDelete('DELETE FROM Video');
-    if (!mounted) return;
-    context.read<VideoProvider>().loadVideos();
-    _showMessage('All videos deleted.');
   }
 
   // Accepts a full YouTube URL or a bare 11-character video id.
@@ -292,23 +275,6 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                   .toList(),
               onChanged: (value) => setState(() => _type = value!),
             ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<User>(
-              initialValue: _author,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'Channel',
-                border: OutlineInputBorder(),
-              ),
-              items: sampleUser
-                  .map((user) => DropdownMenuItem(
-                        value: user,
-                        child: Text(user.username,
-                            overflow: TextOverflow.ellipsis),
-                      ))
-                  .toList(),
-              onChanged: (value) => setState(() => _author = value!),
-            ),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: _isUploading ? null : _upload,
@@ -320,11 +286,6 @@ class _AddVideoScreenState extends State<AddVideoScreen> {
                     )
                   : const Icon(Icons.cloud_upload),
               label: Text(_isUploading ? 'Uploading...' : 'Upload'),
-            ),
-            const SizedBox(height: 32),
-            TextButton(
-              onPressed: _isUploading ? null : deleteAllData,
-              child: const Text('Delete All Data'),
             ),
           ],
         ),

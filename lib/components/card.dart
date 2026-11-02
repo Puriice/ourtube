@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:wetube/model/video.dart';
+import 'package:wetube/components/user_avatar.dart';
+import 'package:wetube/components/youtube_tag.dart';
 
 //format
 import 'package:wetube/components/time_pass_calculation_format.dart';
@@ -56,6 +58,12 @@ class VideoCard extends StatelessWidget {
                                 _thumbnailPlaceholder(),
                           ),
                   ),
+                  if (!video.isLocal)
+                    const Positioned(
+                      top: 10.0,
+                      left: 10.0,
+                      child: YoutubeTag(),
+                    ),
                   Positioned(
                     bottom: 10.0,
                     right: 10.0,
@@ -80,22 +88,7 @@ class VideoCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                          50.0), // Add rounded corners here
-                      child: Image.network(
-                        video.author.profileImageUrl,
-                        height: 50,
-                        width: 50,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const SizedBox(
-                          height: 50,
-                          width: 50,
-                          child: Icon(Icons.account_circle, size: 50),
-                        ),
-                      ),
-                    ),
+                    UserAvatar(user: video.author, size: 50),
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20.0),

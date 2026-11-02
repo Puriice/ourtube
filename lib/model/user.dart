@@ -2,11 +2,17 @@ class User {
   final String username;
   final String profileImageUrl;
   final String subscribers;
+  // Avatar picked from the phone; used instead of profileImageUrl when set.
+  final String? profileImagePath;
+  // True for the profile of the person using the app.
+  final bool isMe;
 
   const User({
     required this.username,
     required this.profileImageUrl,
     required this.subscribers,
+    this.profileImagePath,
+    this.isMe = false,
   });
 }
 
